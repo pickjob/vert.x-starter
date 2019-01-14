@@ -1,0 +1,69 @@
+plugins {
+    id 'java'
+    id 'idea'
+    id 'application'
+    id 'org.gradle.java.experimental-jigsaw' version '0.1.1'
+}
+
+group 'pickjob'
+version '1.0-SNAPSHOT'
+mainClassName = 'app.HelloVerticle'
+javaModule.name = 'pickjob.vertx.starter'
+
+dependencies {
+    implementation 'io.vertx:vertx-core:3.6.2'
+    testImplementation 'junit:junit:4.12'
+}
+
+repositories {
+    maven {
+        url "https://maven.aliyun.com/repository/central"
+    }
+}
+
+/*
+ *  Plugin: java配置
+ */
+compileJava {
+    sourceCompatibility = 11
+    targetCompatibility = 11
+    options.encoding = 'UTF-8'
+}
+compileTestJava {
+    sourceCompatibility = 11
+    targetCompatibility = 11
+    options.encoding = 'UTF-8'
+}
+processResources {
+    destinationDir = sourceSets.main.java.outputDir
+}
+processTestResources {
+    destinationDir = sourceSets.test.java.outputDir
+}
+jar {
+    manifest {
+        attributes 'Main-Class': "${mainClassName}"
+        attributes 'Class-Path': configurations.runtimeClasspath.files.collect { it.name }.join(' ')
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+/*
+ * Plugin: Appliction
+ */
+run {
+    main = "${mainClassName}"
+}
+/*
+ *  Plugin: idea 配置
+ */
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+        inheritOutputDirs = false
+        outputDir = sourceSets.main.java.outputDir
+        testOutputDir = sourceSets.test.java.outputDir
+    }
+}
